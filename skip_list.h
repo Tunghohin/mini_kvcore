@@ -9,6 +9,8 @@
 
 std::mutex mtx;
 
+#define STORE_FILE "store/dumpFile"
+
 //class template to implement node.
 template<typename K, typename V>
 class Node{
@@ -254,11 +256,19 @@ inline unsigned int skip_list<K, V>::get_level() const
 }
 
 template<typename K, typename V>
-void skip_list<K, V>::dump_file()
-{
-	std::fstream fs;
-	fs.open("./test.txt", std::fstream::trunc);
+void skip_list<K, V>::dump_file() {
 
+	std::cout << "dump_file-----------------" << std::endl;
+	_file_writer.open(STORE_FILE);
+	Node<K, V> *node = this->_header->next_node[0];
+
+	while (node != NULL) {
+		_file_writer << node->get_key() << ":" << node->get_val() << "\n";
+		node = node->next_node[0];
+	}
+
+	_file_writer.flush();
+	_file_writer.close();
 }
 
 template<typename K, typename V>
