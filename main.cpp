@@ -1,7 +1,11 @@
 #include <iostream>
-#include "skiplist.h"
+#include "skip_list.h"
 
 int main()
 {
-	skiplist<int, std::string> skl(18);
+	skip_list<int, std::string> sl(5);
+	sl.insert(1, "asdf");
+	sl.insert(1, "adsssf");
+
+
 }

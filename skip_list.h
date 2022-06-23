@@ -4,6 +4,7 @@
 #include <fstream>
 #include <mutex>
 #include <cstring>
+#include <random>
 
 #define STORE_DIR "./store/dumpfile"
 
@@ -13,8 +14,7 @@ std::mutex mtx;
 template<typename K, typename V>
 class Node{
 public:
-	Node() {};
-	Node(K k, V v, int lv);
+	Node(K, V, int);
 	~Node();
 
 	K get_key() const;
@@ -51,9 +51,9 @@ void Node<K, V>::set_val(V cur_val)
 template<typename K, typename V>
 Node<K, V>::Node(const K k, const V v, int level)
 {
-	this->key = k;
-	this->val = v;
-	this->_node_level = level;
+	key = k;
+	val = v;
+	_node_level = level;
 
 	this->next_node = new Node<K, V> *[level + 1];
 	memset(next_node, 0, sizeof(Node<K, V>*) * (level + 1));
@@ -67,25 +67,26 @@ Node<K, V>::~Node()
 
 //class template for skip list.
 template<typename K, typename V>
-class skiplist{
+class skip_list{
 public:
-	explicit skiplist(int);
-	~skiplist();
+	explicit skip_list(int);
+	~skip_list();
 
 	int insert(K, V);
+	unsigned int size();
 
 private:
+	int _element_count;
 	int _max_level;
 	int _cur_level;
 
 	int _get_random_level();
 
 	Node<K, V> *_header;
-	Node<K, V> *create_node(K, V);
 };
 
 template<typename K, typename V>
-int skiplist<K, V>::insert(const K key, const V val)
+int skip_list<K, V>::insert(const K key, const V val)
 {
 	mtx.lock();
 	Node<K, V> *cur = this->_header;
@@ -97,7 +98,7 @@ int skiplist<K, V>::insert(const K key, const V val)
 	//from top to bottom
 	for (int i = _cur_level; i >= 0; i--)
 	{
-		while (cur->next_node[i] != nullptr && cur->next_node[i]->get_ket() < key)
+		while (cur->next_node[i] != nullptr && cur->next_node[i]->get_key() < key)
 		{
 			cur = cur->next_node[i];
 		}
@@ -127,12 +128,23 @@ int skiplist<K, V>::insert(const K key, const V val)
 		}
 		_cur_level = random_level;
 
-		Node<K, V>* insert_node = create_node(key, val);
+		auto insert_node = new Node<K, V>(key, val, random_level);
+
+		for (int i = 0; i <= random_level; i++)
+		{
+			insert_node->next_node[i] = update[i]->next_node[i];
+			update[i]->next_node[i] = insert_node;
+		}
+
+		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
+		_element_count++;
 	}
+	mtx.unlock();
+	return 0;
 }
 
 template<typename K, typename V>
-int skiplist<K, V>::_get_random_level()
+int skip_list<K, V>::_get_random_level()
 {
 	int lv = 1;
 	while (rand() % 2) {
@@ -143,18 +155,25 @@ int skiplist<K, V>::_get_random_level()
 }
 
 template<typename K, typename V>
-skiplist<K, V>::skiplist(int max_level)
+unsigned int skip_list<K, V>::size()
 {
-	this->_max_level = max_level;
-	this->_cur_level = 0;
+	return this->_element_count;
+}
 
-	K k = nullptr;
-	V v = nullptr;
+template<typename K, typename V>
+skip_list<K, V>::skip_list(int max_level)
+{
+	_max_level = max_level;
+	_cur_level = 0;
+	_element_count = 0;
+
+	K k;
+	V v;
 	this->_header = new Node<K, V>(k, v, _max_level);
 }
 
 template<typename K, typename V>
-skiplist<K, V>::~skiplist()
+skip_list<K, V>::~skip_list()
 {
 	delete _header;
 }
