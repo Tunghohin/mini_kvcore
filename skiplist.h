@@ -66,4 +66,3 @@ Node<K, V>::~Node()
 {
 	delete []next_node;
 }
-
