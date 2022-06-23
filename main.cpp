@@ -3,9 +3,19 @@
 
 int main()
 {
-	skip_list<int, std::string> sl(5);
-	sl.insert(1, "asdf");
-	sl.insert(1, "adsssf");
+	skip_list<int, std::string> list(5);
 
+	for (int i = 1; i <= 100; i++)
+	{
+		int key = 1 + (rand() % 97);
+		std::string val = "asdfasdf";
 
+		list.insert(key, val);
+	}
+	for (int i = 1; i <= 20; i++)
+	{
+		int key = 1 + (rand() % 97);
+
+		list.erase(key);
+	}
 }

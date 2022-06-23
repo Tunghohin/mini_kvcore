@@ -73,6 +73,8 @@ public:
 	~skip_list();
 
 	int insert(K, V);
+	int erase(K);
+	V search(K);
 	unsigned int size();
 
 private:
@@ -85,13 +87,16 @@ private:
 	Node<K, V> *_header;
 };
 
+//insert element to the skip list.
+//if insert successfully, return 0.
+//if element exists, return 1.
 template<typename K, typename V>
 int skip_list<K, V>::insert(const K key, const V val)
 {
 	mtx.lock();
 	Node<K, V> *cur = this->_header;
 
-	//update is the array which put nodes that need to change of different level.
+	//"update" is the array which put nodes that need to change of different level.
 	Node<K, V> *update[this->_max_level];
 	memset(update, 0, sizeof(Node<K, V> *) * (_max_level + 1));
 
@@ -139,6 +144,55 @@ int skip_list<K, V>::insert(const K key, const V val)
 		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
 		_element_count++;
 	}
+	mtx.unlock();
+	return 0;
+}
+
+//erase element from the skip list.
+//if erase successfully, return 0.
+//if element does not exists, return 1.
+template<typename K, typename V>
+int skip_list<K, V>::erase(K key)
+{
+	mtx.lock();
+	Node<K, V> *current = this->_header;
+	Node<K, V> *update[this->_max_level + 1];
+	memset(update, 0, sizeof(Node<K, V> *) * (_max_level + 1));
+
+	for (int i = _cur_level; i >= 0; i--)
+	{
+		while (current->next_node[i] != nullptr && current->next_node[i]->get_key() < key)
+		{
+			current = current->next_node[i];
+		}
+		update[i] = current;
+	}
+
+	current = current->next_node[0];
+	if (current == nullptr || current->get_key() != key)
+	{
+		std::cout << "Fail to erase! key:" << key << " does not exists." << std::endl;
+		mtx.unlock();
+		return 1;
+	}
+	else if (current->get_key() == key)
+	{
+		for (int i = 0; i <= _cur_level; i++)
+		{
+			if (update[i]->next_node[i] != current)
+				break;
+			update[i]->next_node[i] = current->next_node[i];
+		}
+
+		while (_cur_level > 0 && _header->next_node[_cur_level] == nullptr)
+		{
+			_cur_level--;
+		}
+
+		std::cout << "Successfully erase key:" << key << std::endl;
+		_element_count--;
+	}
+
 	mtx.unlock();
 	return 0;
 }
