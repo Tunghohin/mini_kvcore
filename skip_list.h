@@ -117,7 +117,7 @@ int skip_list<K, V>::insert(const K key, const V val)
 	//if the key value already exists.
 	if (cur && cur->get_key() == key)
 	{
-		std::cout << "Fail to insert! key:" << key << " exists." << std::endl;
+		//std::cout << "Fail to insert! key:" << key << " exists." << std::endl;
 		mtx.unlock();
 		return 1;
 	}
@@ -143,7 +143,7 @@ int skip_list<K, V>::insert(const K key, const V val)
 			update[i]->next_node[i] = insert_node;
 		}
 
-		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
+	//		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
 		_element_count++;
 	}
 	mtx.unlock();

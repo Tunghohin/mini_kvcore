@@ -1,8 +1,9 @@
 #include <iostream>
 #include <chrono>
 #include "skip_list.h"
+#include <map>
 
-skip_list<int, std::string> SkipList(18);
+skip_list<int, std::string> SkipList(8);
 
 std::chrono::duration<double> stress_test(skip_list<int, std::string> &list, int test_count)
 {
@@ -21,5 +22,15 @@ std::chrono::duration<double> stress_test(skip_list<int, std::string> &list, int
 
 int main()
 {
-	std::cout << stress_test(SkipList, 100000).count() << std::endl;
+	int T = 100;
+	std::map<int, int> num_cnt;
+	while (T--)
+	{
+		num_cnt[SkipList._get_random_level()]++;
+	}
+
+	for (auto i : num_cnt)
+	{
+		std::cout << "NUM: " << i.first << " cnt: " << i.second << '\n';
+	}
 }
