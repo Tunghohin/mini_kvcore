@@ -1,12 +1,11 @@
 #pragma once
+#include <ios>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <mutex>
 #include <cstring>
 #include <random>
-
-#define STORE_DIR "./store/dumpfile"
 
 std::mutex mtx;
 
@@ -75,16 +74,19 @@ public:
 
 	int insert(K, V);
 	int erase(K);
-	V search(K);
-	void display_list();
+	int search(K) const;
+	int _get_random_level();
 	inline unsigned int size() const;
 	inline unsigned int get_level() const;
-	int _get_random_level();
+	void dump_file();
+
 private:
 	int _element_count;
 	int _max_level;
 	int _cur_level;
 
+	std::ofstream _file_writer;
+	std::ifstream _file_reader;
 
 	Node<K, V> *_header;
 };
@@ -117,7 +119,7 @@ int skip_list<K, V>::insert(const K key, const V val)
 	//if the key value already exists.
 	if (cur && cur->get_key() == key)
 	{
-		//std::cout << "Fail to insert! key:" << key << " exists." << std::endl;
+		std::cout << "Fail to insert! key:" << key << " exists." << std::endl;
 		mtx.unlock();
 		return 1;
 	}
@@ -132,10 +134,10 @@ int skip_list<K, V>::insert(const K key, const V val)
 			{
 				update[i] = _header;
 			}
+			_cur_level = random_level;
 		}
-		_cur_level = random_level;
 
-		Node<K, V> *insert_node = new Node<K, V>(key, val, _cur_level);
+		auto insert_node = new Node<K, V>(key, val, _cur_level);
 
 		for (int i = 0; i <= random_level; i++)
 		{
@@ -143,7 +145,7 @@ int skip_list<K, V>::insert(const K key, const V val)
 			update[i]->next_node[i] = insert_node;
 		}
 
-	//		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
+		std::cout << "Successfully inserted key:" << key << ", val:" << val << std::endl;
 		_element_count++;
 	}
 	mtx.unlock();
@@ -157,8 +159,8 @@ template<typename K, typename V>
 int skip_list<K, V>::erase(K key)
 {
 	mtx.lock();
-	Node<K, V> *cur = this->_header;
-	Node<K, V> *update[this->_max_level + 1];
+	Node<K, V> *cur = _header;
+	Node<K, V> *update[_max_level + 1];
 	memset(update, 0, sizeof(Node<K, V> *) * (_max_level + 1));
 
 	for (int i = _cur_level; i >= 0; i--)
@@ -173,7 +175,7 @@ int skip_list<K, V>::erase(K key)
 	cur = cur->next_node[0];
 	if (cur == nullptr || cur->get_key() != key)
 	{
-		std::cout << "Fail to erase! key:" << key << " does not exists." << std::endl;
+		std::cout << "Fail to erase! key:" << key << " does not exist." << std::endl;
 		mtx.unlock();
 		return 1;
 	}
@@ -199,27 +201,33 @@ int skip_list<K, V>::erase(K key)
 	return 0;
 }
 
+//get val of key.
+//if search successfully, return 0.
+//if key does not exist, return 1.
 template<typename K, typename V>
-V skip_list<K, V>::search(K key)
+int skip_list<K, V>::search(K key) const
 {
+	Node<K, V> *cur = _header;
 
-}
-
-template<typename K, typename V>
-void skip_list<K, V>::display_list() {
-
-	std::cout << "\n*****Skip List*****"<<"\n";
-	for (int i = 0; i <= _cur_level; i++) {
-		Node<K, V> *node = this->_header->next_node[i];
-		std::cout << "Level " << i << ": ";
-		while (node != NULL) {
-			std::cout << node->get_key() << ":" << node->get_val() << ";";
-			node = node->next_node[i];
+	for (int i = _cur_level; i >= 0; i--)
+	{
+		while (cur->next_node[i] && cur->next_node[i]->get_key() < key)
+		{
+			cur = cur->next_node[i];
 		}
-		std::cout << std::endl;
 	}
-}
 
+	cur = cur->next_node[0];
+
+	if (!cur || cur->get_key() != key)
+	{
+		std::cout << "Key does not exist!" << std::endl;
+		return 1;
+	}
+
+	std::cout << "Found key:" << key << ", val:" << cur->get_val() << std::endl;
+	return 0;
+}
 
 template<typename K, typename V>
 int skip_list<K, V>::_get_random_level()
@@ -243,6 +251,14 @@ template<typename K, typename V>
 inline unsigned int skip_list<K, V>::get_level() const
 {
 	return this->_cur_level;
+}
+
+template<typename K, typename V>
+void skip_list<K, V>::dump_file()
+{
+	std::fstream fs;
+	fs.open("./test.txt", std::fstream::trunc);
+
 }
 
 template<typename K, typename V>

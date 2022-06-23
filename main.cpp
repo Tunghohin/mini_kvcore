@@ -1,9 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <fstream>
 #include "skip_list.h"
-#include <map>
-
-skip_list<int, std::string> SkipList(8);
 
 std::chrono::duration<double> stress_test(skip_list<int, std::string> &list, int test_count)
 {
@@ -14,6 +12,11 @@ std::chrono::duration<double> stress_test(skip_list<int, std::string> &list, int
 		list.insert(rand() % test_count, "aaa");
 	}
 
+	for (int i = 0; i < test_count; i++)
+	{
+		list.search(rand() % test_count);
+	}
+
 	auto finish_time = std::chrono::high_resolution_clock::now();
 	auto elapsed = finish_time - start_time;
 
@@ -22,15 +25,11 @@ std::chrono::duration<double> stress_test(skip_list<int, std::string> &list, int
 
 int main()
 {
-	int T = 100;
-	std::map<int, int> num_cnt;
-	while (T--)
-	{
-		num_cnt[SkipList._get_random_level()]++;
-	}
+	std::ios::sync_with_stdio(false);
+	std::cin.tie(nullptr), std::cout.tie(nullptr);
 
-	for (auto i : num_cnt)
-	{
-		std::cout << "NUM: " << i.first << " cnt: " << i.second << '\n';
-	}
+	skip_list<int, std::string> l(8);
+	const int case_cnt = 10000;
+	stress_test(l, case_cnt);
+	l.dump_file();
 }
