@@ -38,6 +38,4 @@ int main()
 	skip_list<int, std::string> l(10);
 	const int case_cnt = 100000;
 	std::cout << get_QPS(l, case_cnt) << " queries per second" << std::endl;
-
-	l.dump_file();
 }
