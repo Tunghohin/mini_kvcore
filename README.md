@@ -6,10 +6,8 @@
 
 ----------
 
-* ```insert(Key_type key, Val_type val);```插入 kv 对，时间复杂度$O(logn)$
-* ```search(Key_type key);```查询 key 储存的值，时间复杂度$O(logn)$
-* ```erase(Key_type key);```删除 key，时间复杂度$O(logn)$
-* ```dump_file();```
-* ```load_file```
-
-base on https://github.com/youngyangyang04/Skiplist-CPP
+* ```insert(Key_type key, Val_type val);```插入 kv 对，时间复杂度 $O(logn)$
+* ```search(Key_type key);```查询 key 储存的值，时间复杂度 $O(logn)$
+* ```erase(Key_type key);```删除 key，时间复杂度 $O(logn)$
+* ```dump_file();```从内存保存数据进外存
+* ```load_file```从文件读数据进内存
