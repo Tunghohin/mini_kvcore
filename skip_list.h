@@ -75,7 +75,6 @@ public:
 	int insert(K, V);
 	int erase(K);
 	int search(K) const;
-	int _get_random_level();
 	inline unsigned int size() const;
 	inline unsigned int get_level() const;
 	void dump_file();
@@ -87,6 +86,7 @@ private:
 	int _cur_level;
 
 	void phaser(std::string &s, std::string *key, std::string *val);
+	int _get_random_level();
 
 	std::ofstream _file_writer;
 	std::ifstream _file_reader;
