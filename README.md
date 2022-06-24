@@ -18,3 +18,7 @@ mini_kvcore是基于跳表的轻量级键值储存引擎。
 | ```get_level()``` | 获取当前跳表最高索引层高 | ```O(1)```       | ```int```              |
 | ```dump_file();``` | 从内存将数据写入文件 | ```O(n)```       | ```void```              |
 | ```load_file()``` | 从文件读数据进内存 | ```O(nlogn)```       | ```void```              |
+
+----------
+
+based on https://github.com/youngyangyang04/Skiplist-CPP
