@@ -9,8 +9,6 @@
 
 std::mutex mtx;
 
-#define STORE_FILE "store/dumpFile"
-
 //class template to implement node.
 template<typename K, typename V>
 class Node{
@@ -81,11 +79,14 @@ public:
 	inline unsigned int size() const;
 	inline unsigned int get_level() const;
 	void dump_file();
+	void load_file();
 
 private:
 	int _element_count;
 	int _max_level;
 	int _cur_level;
+
+	void phaser(std::string &s, std::string *key, std::string *val);
 
 	std::ofstream _file_writer;
 	std::ifstream _file_reader;
@@ -258,8 +259,8 @@ inline unsigned int skip_list<K, V>::get_level() const
 template<typename K, typename V>
 void skip_list<K, V>::dump_file() {
 
-	std::cout << "dump_file-----------------" << std::endl;
-	_file_writer.open(STORE_FILE);
+	std::cout << "Saving......" << std::endl;
+	_file_writer.open("./store/dumpFile");
 	Node<K, V> *node = this->_header->next_node[0];
 
 	while (node != NULL) {
@@ -267,8 +268,44 @@ void skip_list<K, V>::dump_file() {
 		node = node->next_node[0];
 	}
 
+	std::cout << "Succeed!" << std::endl;
+
 	_file_writer.flush();
 	_file_writer.close();
+}
+
+template<typename K, typename V>
+void skip_list<K, V>::load_file()
+{
+	std::cout << "Loading......" << std::endl;
+	_file_reader.open("./store/dumpFile");
+
+	std::string buf;
+	std::string *key = new std::string();
+	std::string *val = new std::string();
+	while (std::getline(_file_reader, buf))
+	{
+		phaser(buf, key, val);
+		if (key->empty() || val->empty())
+		{
+			continue;
+		}
+		insert(*key, *val);
+	}
+	std::cout << "Succeed!" << std::endl;
+	_file_reader.close();
+}
+
+template<typename K, typename V>
+void skip_list<K, V>::phaser(std::string& s, std::string *key, std::string *val)
+{
+	if (s.find(':') == std::string::npos || s[0] == ':' || s[(int)s.length() - 1] == ':')
+	{
+		return;
+	}
+
+	*key = s.substr(0, s.find(':'));
+	*val = s.substr(s.find(':') + 1, s.length());
 }
 
 template<typename K, typename V>
@@ -286,5 +323,7 @@ skip_list<K, V>::skip_list(int max_level)
 template<typename K, typename V>
 skip_list<K, V>::~skip_list()
 {
+	_file_writer.close();
+	_file_reader.close();
 	delete _header;
 }

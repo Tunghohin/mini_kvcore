@@ -37,5 +37,7 @@ int main()
 
 	skip_list<int, std::string> l(10);
 	const int case_cnt = 1000000;
-	std::cout << get_QPS(l, case_cnt);
+	std::cout << get_QPS(l, case_cnt) << std::endl;
+
+	l.dump_file();
 }
