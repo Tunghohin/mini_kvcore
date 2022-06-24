@@ -85,7 +85,7 @@ private:
 	int _max_level;
 	int _cur_level;
 
-	void phaser(std::string &s, std::string *key, std::string *val);
+	void parser(std::string &s, std::string *key, std::string *val);
 	int _get_random_level();
 
 	std::ofstream _file_writer;
@@ -285,7 +285,7 @@ void skip_list<K, V>::load_file()
 	std::string *val = new std::string();
 	while (std::getline(_file_reader, buf))
 	{
-		phaser(buf, key, val);
+		parser(buf, key, val);
 		if (key->empty() || val->empty())
 		{
 			continue;
@@ -297,7 +297,7 @@ void skip_list<K, V>::load_file()
 }
 
 template<typename K, typename V>
-void skip_list<K, V>::phaser(std::string& s, std::string *key, std::string *val)
+void skip_list<K, V>::parser(std::string& s, std::string *key, std::string *val)
 {
 	if (s.find(':') == std::string::npos || s[0] == ':' || s[(int)s.length() - 1] == ':')
 	{
