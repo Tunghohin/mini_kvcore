@@ -9,6 +9,8 @@
 #include <array>
 #include <memory>
 
+namespace mini {
+
 std::mutex mtx;
 
 //class template to implement node.
@@ -65,3 +67,9 @@ void Node<K, V>::set_val(V cur_val)
 }
 
 //class template for skip list.
+template<typename K, typename V>
+class skip_list {
+
+};
+
+}
