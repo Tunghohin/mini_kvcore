@@ -9,16 +9,18 @@
 #include <array>
 #include <memory>
 
-namespace mini {
+namespace mini 
+{
 
 std::mutex mtx;
 
 //class template to implement node.
 template<typename K, typename V>
-class Node{
+class Node
+{
 public:
 	Node() = default;
-	Node(K k, V v, int);
+	Node(K const, V const, int);
 	~Node() = default;
 
 	inline K get_key() const;
@@ -35,7 +37,7 @@ private:
 };
 
 template<typename K, typename V>
-Node<K, V>::Node(const K key, const V val, int level)
+Node<K, V>::Node(K const key, V const val, int level)
 {
 	this->m_key = key;
 	this->m_val = val;
@@ -68,7 +70,8 @@ void Node<K, V>::set_val(V cur_val)
 
 //class template for skip list.
 template<typename K, typename V>
-class skip_list {
+class skip_list
+{
 
 };
 
